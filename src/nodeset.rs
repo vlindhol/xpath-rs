@@ -110,7 +110,7 @@ impl<'d> Node<'d> {
             } else {
                 name.local_part().to_owned()
             }
-        };
+        }
 
         match *self {
             Root(_) => None,
@@ -234,7 +234,7 @@ impl<'d> Node<'d> {
                     _ => {}
                 }
             }
-        };
+        }
 
         fn text_descendants_string_value(node: Node<'_>) -> String {
             let mut result = String::new();

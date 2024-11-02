@@ -219,11 +219,7 @@ mod test {
     #[derive(Debug)]
     struct DummyNodeTest;
     impl NodeTest for DummyNodeTest {
-        fn test<'d>(
-            &self,
-            context: &context::Evaluation<'_, 'd>,
-            result: &mut OrderedNodes<'d>,
-        ) {
+        fn test<'d>(&self, context: &context::Evaluation<'_, 'd>, result: &mut OrderedNodes<'d>) {
             result.add(context.node)
         }
     }

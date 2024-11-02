@@ -2,6 +2,7 @@
 
 use snafu::Snafu;
 use std::borrow::ToOwned;
+use std::cmp::Ordering;
 use std::collections::hash_map::Entry;
 use std::collections::HashMap;
 use std::iter;
@@ -107,12 +108,10 @@ impl<'d> Args<'d> {
     /// Ensures that there are exactly the requested number of arguments.
     pub fn exactly(&self, expected: usize) -> Result<(), Error> {
         let actual = self.0.len();
-        if actual < expected {
-            Err(Error::NotEnoughArguments { expected, actual })
-        } else if actual > expected {
-            Err(Error::TooManyArguments { expected, actual })
-        } else {
-            Ok(())
+        match actual.cmp(&expected) {
+            Ordering::Less => Err(Error::NotEnoughArguments { expected, actual }),
+            Ordering::Greater => Err(Error::TooManyArguments { expected, actual }),
+            Ordering::Equal => Ok(()),
         }
     }
 
@@ -353,13 +352,13 @@ impl Function for TwoStringPredicate {
 fn starts_with() -> TwoStringPredicate {
     fn imp(a: &str, b: &str) -> bool {
         str::starts_with(a, b)
-    };
+    }
     TwoStringPredicate(imp)
 }
 fn contains() -> TwoStringPredicate {
     fn imp(a: &str, b: &str) -> bool {
         str::contains(a, b)
-    };
+    }
     TwoStringPredicate(imp)
 }
 

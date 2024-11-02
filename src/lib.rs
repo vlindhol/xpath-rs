@@ -19,14 +19,12 @@
 //! use sxd_document::parser;
 //! use sxd_xpath::{evaluate_xpath, Value};
 //!
-//! fn main() {
-//!     let package = parser::parse("<root>hello</root>").expect("failed to parse XML");
-//!     let document = package.as_document();
+//! let package = parser::parse("<root>hello</root>").expect("failed to parse XML");
+//! let document = package.as_document();
 //!
-//!     let value = evaluate_xpath(&document, "/root").expect("XPath evaluation failed");
+//! let value = evaluate_xpath(&document, "/root").expect("XPath evaluation failed");
 //!
-//!     assert_eq!("hello", value.string());
-//! }
+//! assert_eq!("hello", value.string());
 //! ```
 //!
 //! Evaluating an XPath returns a [`Value`][], representing the
@@ -45,21 +43,19 @@
 //! use sxd_document::parser;
 //! use sxd_xpath::{Factory, Context, Value};
 //!
-//! fn main() {
-//!     let package = parser::parse("<root>hello</root>")
-//!         .expect("failed to parse XML");
-//!     let document = package.as_document();
+//! let package = parser::parse("<root>hello</root>")
+//!     .expect("failed to parse XML");
+//! let document = package.as_document();
 //!
-//!     let factory = Factory::new();
-//!     let xpath = factory.build("/root").expect("Could not compile XPath");
+//! let factory = Factory::new();
+//! let xpath = factory.build("/root").expect("Could not compile XPath");
 //!
-//!     let context = Context::new();
+//! let context = Context::new();
 //!
-//!     let value = xpath.evaluate(&context, document.root())
-//!         .expect("XPath evaluation failed");
+//! let value = xpath.evaluate(&context, document.root())
+//!     .expect("XPath evaluation failed");
 //!
-//!     assert_eq!("hello", value.string());
-//! }
+//! assert_eq!("hello", value.string());
 //! ```
 //!
 //! See [`Context`][] for details on how to customize the
@@ -439,12 +435,10 @@ pub enum Error {
 /// use sxd_document::parser;
 /// use sxd_xpath::{evaluate_xpath, Value};
 ///
-/// fn main() {
-///     let package = parser::parse("<root><a>1</a><b>2</b></root>").expect("failed to parse the XML");
-///     let document = package.as_document();
+/// let package = parser::parse("<root><a>1</a><b>2</b></root>").expect("failed to parse the XML");
+/// let document = package.as_document();
 ///
-///     assert_eq!(Ok(Value::Number(3.0)), evaluate_xpath(&document, "/*/a + /*/b"));
-/// }
+/// assert_eq!(Ok(Value::Number(3.0)), evaluate_xpath(&document, "/*/a + /*/b"));
 /// ```
 pub fn evaluate_xpath<'d>(document: &'d Document<'d>, xpath: &str) -> Result<Value<'d>, Error> {
     let factory = Factory::new();

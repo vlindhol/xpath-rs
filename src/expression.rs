@@ -64,6 +64,7 @@ pub type SubExpression = Box<dyn Expression + 'static>;
 macro_rules! binary_constructor(
     ($t:ident) => (
         impl $t {
+            #[allow(clippy::new_ret_no_self)]
             pub fn new(left: SubExpression, right: SubExpression) -> SubExpression {
                 Box::new($t{left, right})
             }
@@ -106,10 +107,7 @@ pub struct Equal {
 binary_constructor!(Equal);
 
 impl Equal {
-    fn boolean_evaluate(
-        &self,
-        context: &context::Evaluation<'_, '_>,
-    ) -> Result<bool, Error> {
+    fn boolean_evaluate(&self, context: &context::Evaluation<'_, '_>) -> Result<bool, Error> {
         let left_val = self.left.evaluate(context)?;
         let right_val = self.right.evaluate(context)?;
 
@@ -162,6 +160,7 @@ pub struct NotEqual {
 }
 
 impl NotEqual {
+    #[allow(clippy::new_ret_no_self)]
     pub fn new(left: SubExpression, right: SubExpression) -> SubExpression {
         Box::new(NotEqual {
             equal: Equal { left, right },
@@ -334,6 +333,7 @@ pub struct Path {
 }
 
 impl Path {
+    #[allow(clippy::new_ret_no_self)]
     pub fn new(start_point: SubExpression, steps: Vec<Step>) -> SubExpression {
         Box::new(Path { start_point, steps })
     }
@@ -359,6 +359,7 @@ pub struct Filter {
 }
 
 impl Filter {
+    #[allow(clippy::new_ret_no_self)]
     pub fn new(node_selector: SubExpression, predicate: SubExpression) -> SubExpression {
         let predicate = Predicate {
             expression: predicate,

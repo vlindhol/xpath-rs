@@ -701,15 +701,11 @@ mod test {
 
     use super::*;
 
-    macro_rules! tokens(
-        ($($e:expr),*) => ({
-            // leading _ to allow empty construction without a warning.
-            let mut _temp: Vec<TokenResult> = ::std::vec::Vec::new();
-            $(_temp.push(Ok($e));)*
-            _temp
-        });
-        ($($e:expr),+,) => (tokens!($($e),+))
-    );
+    macro_rules! tokens {
+        ($($e:expr),* $(,)?) => {
+            vec![$(Ok($e)),*]
+        };
+    }
 
     fn name_test(local_part: &str) -> Token {
         Token::NameTest(node_test::NameTest {
