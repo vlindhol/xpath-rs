@@ -1,7 +1,7 @@
 use std::borrow::ToOwned;
 use sxd_document::{dom, parser};
-use sxd_xpath::{context, function, nodeset};
-use sxd_xpath::{evaluate_xpath, Context, Factory, Value};
+use xpath_rs::{context, function, nodeset};
+use xpath_rs::{evaluate_xpath, Context, Factory, Value};
 
 #[test]
 fn functions_accept_arguments() {
@@ -114,9 +114,9 @@ impl<'d> Setup<'d> {
 struct ConstantValueFunction(f64);
 
 impl function::Function for ConstantValueFunction {
-    fn evaluate<'c, 'd>(
+    fn evaluate<'d>(
         &self,
-        _context: &context::Evaluation<'c, 'd>,
+        _context: &context::Evaluation<'_, 'd>,
         _args: Vec<Value<'d>>,
     ) -> Result<Value<'d>, function::Error> {
         Ok(Value::Number(self.0))

@@ -1,21 +1,20 @@
 [package]
-name = "sxd-xpath"
-version = "0.4.2"
-authors = ["Jake Goulding <jake.goulding@gmail.com>"]
+name = "xpath-rs"
+version = "0.5.0"
+authors = [
+    "Ville Lindholm <ville@lindholm.dev>",
+    "Jake Goulding <jake.goulding@gmail.com>",
+]
 edition = "2018"
 
-description = "A Rust XML XPath library"
+description = "An XPath 1.0 library written in Rust"
 readme = "README.md"
 keywords = ["xml", "xpath"]
 
-repository = "https://github.com/shepmaster/sxd-xpath"
-documentation = "https://docs.rs/sxd-xpath/"
+repository = "https://github.com/vlindhol/xpath-rs"
+documentation = "https://docs.rs/xpath-rs/"
 
-license = "MIT/Apache-2.0"
-
-[features]
-# Unused -- remove on next semver-imcompatible release
-unstable = []
+license = "MIT"
 
 [dependencies]
 peresil = "0.3.0"
