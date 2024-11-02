@@ -71,7 +71,7 @@ where
 
     fn next_token_is(&mut self, token: &Token) -> bool {
         match self.peek() {
-            Some(&Ok(ref t)) => t == token,
+            Some(Ok(t)) => t == token,
             _ => false,
         }
     }
@@ -731,7 +731,7 @@ mod test {
     impl<'d> ApproxEq for Value<'d> {
         fn is_approx_eq(&self, other: &Value<'d>) -> bool {
             match (self, other) {
-                (&Number(ref x), &Number(ref y)) => x.is_approx_eq(y),
+                (Number(x), Number(y)) => x.is_approx_eq(y),
                 _ => panic!("It's nonsensical to compare these quantities"),
             }
         }
@@ -749,12 +749,12 @@ mod test {
 
     impl<'d> TestDoc<'d> {
         fn root(&'d self) -> Root<'d> {
-            let &TestDoc(ref doc) = self;
+            let TestDoc(doc) = self;
             doc.root()
         }
 
         fn top_node(&'d self) -> Element<'d> {
-            let &TestDoc(ref doc) = self;
+            let TestDoc(doc) = self;
 
             let kids = doc.root().children();
             match kids.len() {
@@ -773,7 +773,7 @@ mod test {
         }
 
         fn add_child(&'d self, parent: Element<'d>, name: &str) -> Element<'d> {
-            let &TestDoc(ref doc) = self;
+            let TestDoc(doc) = self;
 
             let n = doc.create_element(name);
             parent.append_child(n);
@@ -781,7 +781,7 @@ mod test {
         }
 
         fn add_text(&'d self, parent: Element<'d>, value: &str) -> Text<'d> {
-            let &TestDoc(ref doc) = self;
+            let TestDoc(doc) = self;
 
             let tn = doc.create_text(value);
             parent.append_child(tn);

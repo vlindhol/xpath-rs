@@ -279,10 +279,10 @@ conversion_trait!(Node, {
     dom::ProcessingInstruction => Node::ProcessingInstruction
 });
 
-impl<'d> Into<Node<'d>> for dom::ChildOfRoot<'d> {
-    fn into(self) -> Node<'d> {
+impl<'d> From<dom::ChildOfRoot<'d>> for Node<'d> {
+    fn from(val: dom::ChildOfRoot<'d>) -> Self {
         use self::Node::*;
-        match self {
+        match val {
             dom::ChildOfRoot::Element(n) => Element(n),
             dom::ChildOfRoot::Comment(n) => Comment(n),
             dom::ChildOfRoot::ProcessingInstruction(n) => ProcessingInstruction(n),
@@ -290,10 +290,10 @@ impl<'d> Into<Node<'d>> for dom::ChildOfRoot<'d> {
     }
 }
 
-impl<'d> Into<Node<'d>> for dom::ChildOfElement<'d> {
-    fn into(self) -> Node<'d> {
+impl<'d> From<dom::ChildOfElement<'d>> for Node<'d> {
+    fn from(val: dom::ChildOfElement<'d>) -> Self {
         use self::Node::*;
-        match self {
+        match val {
             dom::ChildOfElement::Element(n) => Element(n),
             dom::ChildOfElement::Text(n) => Text(n),
             dom::ChildOfElement::Comment(n) => Comment(n),
@@ -302,10 +302,10 @@ impl<'d> Into<Node<'d>> for dom::ChildOfElement<'d> {
     }
 }
 
-impl<'d> Into<Node<'d>> for dom::ParentOfChild<'d> {
-    fn into(self) -> Node<'d> {
+impl<'d> From<dom::ParentOfChild<'d>> for Node<'d> {
+    fn from(val: dom::ParentOfChild<'d>) -> Self {
         use self::Node::*;
-        match self {
+        match val {
             dom::ParentOfChild::Root(n) => Root(n),
             dom::ParentOfChild::Element(n) => Element(n),
         }

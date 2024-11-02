@@ -6,14 +6,14 @@ use crate::context;
 use crate::nodeset::{self, OrderedNodes};
 
 pub trait NodeTest: fmt::Debug {
-    fn test<'c, 'd>(&self, context: &context::Evaluation<'c, 'd>, result: &mut OrderedNodes<'d>);
+    fn test<'d>(&self, context: &context::Evaluation<'_, 'd>, result: &mut OrderedNodes<'d>);
 }
 
 impl<T: ?Sized> NodeTest for Box<T>
 where
     T: NodeTest,
 {
-    fn test<'c, 'd>(&self, context: &context::Evaluation<'c, 'd>, result: &mut OrderedNodes<'d>) {
+    fn test<'d>(&self, context: &context::Evaluation<'_, 'd>, result: &mut OrderedNodes<'d>) {
         (**self).test(context, result)
     }
 }
@@ -55,7 +55,7 @@ impl Attribute {
 }
 
 impl NodeTest for Attribute {
-    fn test<'c, 'd>(&self, context: &context::Evaluation<'c, 'd>, result: &mut OrderedNodes<'d>) {
+    fn test<'d>(&self, context: &context::Evaluation<'_, 'd>, result: &mut OrderedNodes<'d>) {
         if let nodeset::Node::Attribute(ref a) = context.node {
             if self.name_test.matches(context, a.name()) {
                 result.add(context.node);
@@ -76,7 +76,7 @@ impl Namespace {
 }
 
 impl NodeTest for Namespace {
-    fn test<'c, 'd>(&self, context: &context::Evaluation<'c, 'd>, result: &mut OrderedNodes<'d>) {
+    fn test<'d>(&self, context: &context::Evaluation<'_, 'd>, result: &mut OrderedNodes<'d>) {
         if let nodeset::Node::Namespace(ref ns) = context.node {
             if self.name_test.matches(context, QName::new(ns.prefix())) {
                 result.add(context.node);
@@ -97,7 +97,7 @@ impl Element {
 }
 
 impl NodeTest for Element {
-    fn test<'c, 'd>(&self, context: &context::Evaluation<'c, 'd>, result: &mut OrderedNodes<'d>) {
+    fn test<'d>(&self, context: &context::Evaluation<'_, 'd>, result: &mut OrderedNodes<'d>) {
         if let nodeset::Node::Element(ref e) = context.node {
             if self.name_test.matches(context, e.name()) {
                 result.add(context.node);
@@ -111,7 +111,7 @@ impl NodeTest for Element {
 pub struct Node;
 
 impl NodeTest for Node {
-    fn test<'c, 'd>(&self, context: &context::Evaluation<'c, 'd>, result: &mut OrderedNodes<'d>) {
+    fn test<'d>(&self, context: &context::Evaluation<'_, 'd>, result: &mut OrderedNodes<'d>) {
         result.add(context.node);
     }
 }
@@ -121,7 +121,7 @@ impl NodeTest for Node {
 pub struct Text;
 
 impl NodeTest for Text {
-    fn test<'c, 'd>(&self, context: &context::Evaluation<'c, 'd>, result: &mut OrderedNodes<'d>) {
+    fn test<'d>(&self, context: &context::Evaluation<'_, 'd>, result: &mut OrderedNodes<'d>) {
         if let nodeset::Node::Text(_) = context.node {
             result.add(context.node);
         }
@@ -133,7 +133,7 @@ impl NodeTest for Text {
 pub struct Comment;
 
 impl NodeTest for Comment {
-    fn test<'c, 'd>(&self, context: &context::Evaluation<'c, 'd>, result: &mut OrderedNodes<'d>) {
+    fn test<'d>(&self, context: &context::Evaluation<'_, 'd>, result: &mut OrderedNodes<'d>) {
         if let nodeset::Node::Comment(_) = context.node {
             result.add(context.node);
         }
@@ -152,7 +152,7 @@ impl ProcessingInstruction {
 }
 
 impl NodeTest for ProcessingInstruction {
-    fn test<'c, 'd>(&self, context: &context::Evaluation<'c, 'd>, result: &mut OrderedNodes<'d>) {
+    fn test<'d>(&self, context: &context::Evaluation<'_, 'd>, result: &mut OrderedNodes<'d>) {
         if let nodeset::Node::ProcessingInstruction(pi) = context.node {
             match self.target {
                 Some(ref name) if name == pi.target() => result.add(context.node),

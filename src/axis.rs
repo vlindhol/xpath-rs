@@ -15,9 +15,9 @@ pub enum PrincipalNodeType {
 pub trait AxisLike: fmt::Debug {
     /// Applies the given node test to the nodes selected by this axis,
     /// adding matching nodes to the nodeset.
-    fn select_nodes<'c, 'd>(
+    fn select_nodes<'d>(
         &self,
-        context: &context::Evaluation<'c, 'd>,
+        context: &context::Evaluation<'_, 'd>,
         node_test: &dyn NodeTest,
     ) -> OrderedNodes<'d>;
 
@@ -66,9 +66,9 @@ impl<'c, 'd> CompleteNodeTest<'c, 'd> {
 }
 
 impl AxisLike for Axis {
-    fn select_nodes<'c, 'd>(
+    fn select_nodes<'d>(
         &self,
-        context: &context::Evaluation<'c, 'd>,
+        context: &context::Evaluation<'_, 'd>,
         node_test: &dyn NodeTest,
     ) -> OrderedNodes<'d> {
         use self::Axis::*;
@@ -219,9 +219,9 @@ mod test {
     #[derive(Debug)]
     struct DummyNodeTest;
     impl NodeTest for DummyNodeTest {
-        fn test<'c, 'd>(
+        fn test<'d>(
             &self,
-            context: &context::Evaluation<'c, 'd>,
+            context: &context::Evaluation<'_, 'd>,
             result: &mut OrderedNodes<'d>,
         ) {
             result.add(context.node)
