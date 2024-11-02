@@ -27,8 +27,8 @@ type Namespaces = HashMap<String, String>;
 /// ```
 /// use std::collections::HashMap;
 /// use sxd_document::parser;
-/// use sxd_xpath::{Factory, Context, Value};
-/// use sxd_xpath::{context, function};
+/// use xpath_rs::{Factory, Context, Value};
+/// use xpath_rs::{context, function};
 ///
 /// struct Sigmoid;
 /// impl function::Function for Sigmoid {

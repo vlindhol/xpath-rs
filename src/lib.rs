@@ -17,7 +17,7 @@
 //!
 //! ```
 //! use sxd_document::parser;
-//! use sxd_xpath::{evaluate_xpath, Value};
+//! use xpath_rs::{evaluate_xpath, Value};
 //!
 //! let package = parser::parse("<root>hello</root>").expect("failed to parse XML");
 //! let document = package.as_document();
@@ -41,7 +41,7 @@
 //!
 //! ```
 //! use sxd_document::parser;
-//! use sxd_xpath::{Factory, Context, Value};
+//! use xpath_rs::{Factory, Context, Value};
 //!
 //! let package = parser::parse("<root>hello</root>")
 //!     .expect("failed to parse XML");
@@ -261,6 +261,9 @@ impl<'d> Value<'d> {
                     } else {
                         "Infinity".to_owned()
                     }
+                } else if n == 0.0 {
+                    // catches -0.0 also
+                    0.0.to_string()
                 } else {
                     n.to_string()
                 }
@@ -343,9 +346,9 @@ impl XPath {
     ///
     /// The most common case is to pass in a reference to a [`Context`][]:
     ///
-    /// ```rust,no-run
+    /// ```rust,no_run
     /// use sxd_document::dom::Document;
-    /// use sxd_xpath::{XPath, Context};
+    /// use xpath_rs::{XPath, Context};
     ///
     /// fn my_evaluate(doc: Document, xpath: XPath) {
     ///     let mut context = Context::new();
@@ -433,7 +436,7 @@ pub enum Error {
 ///
 /// ```
 /// use sxd_document::parser;
-/// use sxd_xpath::{evaluate_xpath, Value};
+/// use xpath_rs::{evaluate_xpath, Value};
 ///
 /// let package = parser::parse("<root><a>1</a><b>2</b></root>").expect("failed to parse the XML");
 /// let document = package.as_document();

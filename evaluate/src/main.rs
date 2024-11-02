@@ -7,7 +7,7 @@ use std::io::{self, Read};
 
 use sxd_document::parser::parse;
 
-use sxd_xpath::{Context, Factory, Value, XPath};
+use xpath_rs::{Context, Factory, Value, XPath};
 
 use getopts::Options;
 
