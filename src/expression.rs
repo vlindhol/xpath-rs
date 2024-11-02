@@ -729,6 +729,7 @@ mod test {
             name: "left".into(),
         });
         let right = Box::new(Literal {
+            #[allow(clippy::approx_constant)]
             value: Value::Number(6.28),
         });
 

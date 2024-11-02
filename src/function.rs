@@ -1030,7 +1030,7 @@ mod test {
     fn assert_number(expected: f64, actual: Result<Value<'_>, Error>) {
         match actual {
             Ok(Value::Number(n)) => assert_eq!(PedanticNumber(n), PedanticNumber(expected)),
-            _ => assert!(false, "{:?} did not evaluate correctly", actual),
+            _ => panic!("{:?} did not evaluate correctly", actual),
         }
     }
 
