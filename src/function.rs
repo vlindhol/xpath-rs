@@ -1,6 +1,5 @@
 //! Support for registering and creating XPath functions.
 
-use snafu::Snafu;
 use std::borrow::ToOwned;
 use std::cmp::Ordering;
 use std::collections::hash_map::Entry;
@@ -8,6 +7,7 @@ use std::collections::HashMap;
 use std::iter;
 use std::ops::Index;
 use sxd_document::XmlChar;
+use thiserror::Error as ThisError;
 
 use crate::context;
 use crate::nodeset::Nodeset;
@@ -45,17 +45,17 @@ impl<'a> From<&'a Value<'a>> for ArgumentType {
 }
 
 /// The errors that may occur while evaluating a function
-#[derive(Debug, Snafu, Clone, PartialEq, Hash)]
+#[derive(Debug, ThisError, Clone, PartialEq, Hash)]
 pub enum Error {
-    #[snafu(display("too many arguments, expected {} but had {}", expected, actual))]
+    #[error("too many arguments, expected {expected:?} but had {actual:?}")]
     TooManyArguments { expected: usize, actual: usize },
-    #[snafu(display("not enough arguments, expected {} but had {}", expected, actual))]
+    #[error("not enough arguments, expected {expected:?} but had {actual:?}")]
     NotEnoughArguments { expected: usize, actual: usize },
-    #[snafu(display("attempted to use an argument that was not present"))]
+    #[error("attempted to use an argument that was not present")]
     ArgumentMissing,
-    #[snafu(display("argument was expected to be a nodeset but was a {:?}", actual))]
+    #[error("argument was expected to be a nodeset but was a {actual:?}")]
     ArgumentNotANodeset { actual: ArgumentType },
-    #[snafu(display("could not evaluate function: {}", what))]
+    #[error("could not evaluate function: {what:?}")]
     Other { what: String },
 }
 

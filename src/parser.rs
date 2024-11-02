@@ -1,5 +1,5 @@
-use snafu::{ensure, OptionExt, ResultExt, Snafu};
 use std::iter::Peekable;
+use thiserror::Error as ThisError;
 
 use crate::axis::{Axis, AxisLike, PrincipalNodeType};
 use crate::expression::{self, SubExpression};
@@ -17,26 +17,25 @@ impl Parser {
     }
 }
 
-#[derive(Debug, Snafu, Clone, PartialEq)]
-#[cfg_attr(test, snafu(visibility(pub(crate))))]
+#[derive(Debug, ThisError, Clone, PartialEq)]
 pub enum Error {
-    /// XPath was empty
+    #[error("XPath was empty")]
     NoXPath,
-    /// empty predicate
+    #[error("empty predicate")]
     EmptyPredicate,
-    /// extra unparsed tokens
+    #[error("extra unparsed tokens")]
     ExtraUnparsedTokens,
-    /// ran out of input
+    #[error("ran out of input")]
     RanOutOfInput,
-    /// right hand side of expression is missing
+    #[error("right hand side of expression is missing")]
     RightHandSideExpressionMissing,
-    /// function argument is missing
+    #[error("function argument is missing")]
     ArgumentMissing,
-    #[snafu(display("tokenizer error: {}", source))]
+    #[error("tokenizer error")]
     Tokenizer { source: tokenizer::Error },
-    /// trailing slash
+    #[error("trailing slash")]
     TrailingSlash,
-    #[snafu(display("unexpected token: {:?}", token))]
+    #[error("unexpected token")]
     UnexpectedToken { token: Token },
 }
 
@@ -77,9 +76,15 @@ where
     }
 
     fn consume(&mut self, token: &Token) -> Result<(), Error> {
-        let x = self.next().context(RanOutOfInput)?.context(Tokenizer)?;
-        ensure!(&x == token, UnexpectedToken { token: x });
-        Ok(())
+        let x = self
+            .next()
+            .ok_or(Error::RanOutOfInput)?
+            .map_err(|e| Error::Tokenizer { source: e })?;
+        if &x == token {
+            Ok(())
+        } else {
+            Err(Error::UnexpectedToken { token: x })
+        }
     }
 }
 
@@ -87,11 +92,11 @@ where
 /// single value.
 macro_rules! consume_value(
     ($source:expr, Token::$token:ident) => ({
-        let next = $source.next().context(RanOutOfInput)?.context(Tokenizer)?;
+        let next = $source.next().ok_or(Error::RanOutOfInput)?.map_err(|e| Error::Tokenizer { source: e })?;
 
         match next {
             Token::$token(x) => x,
-            token => return UnexpectedToken { token }.fail(),
+            token => return Err(Error::UnexpectedToken { token }),
         }
     });
 );
@@ -131,7 +136,8 @@ impl LeftAssociativeBinaryParser {
                 if source.next_token_is(&rule.token) {
                     source.consume(&rule.token)?;
 
-                    let right = child_parse(source)?.context(RightHandSideExpressionMissing)?;
+                    let right =
+                        child_parse(source)?.ok_or(Error::RightHandSideExpressionMissing)?;
 
                     left = (rule.builder)(left, right);
 
@@ -300,7 +306,9 @@ impl Parser {
         while source.next_token_is(&Token::Comma) {
             source.consume(&Token::Comma)?;
 
-            let arg = self.parse_expression(source)?.context(ArgumentMissing)?;
+            let arg = self
+                .parse_expression(source)?
+                .ok_or(Error::ArgumentMissing)?;
             arguments.push(arg);
         }
 
@@ -363,7 +371,9 @@ impl Parser {
         if source.next_token_is(&Token::LeftBracket) {
             source.consume(&Token::LeftBracket)?;
 
-            let predicate = self.parse_expression(source)?.context(EmptyPredicate)?;
+            let predicate = self
+                .parse_expression(source)?
+                .ok_or(Error::EmptyPredicate)?;
             source.consume(&Token::RightBracket)?;
             Ok(Some(predicate))
         } else {
@@ -420,7 +430,7 @@ impl Parser {
                 while source.next_token_is(&Token::Slash) {
                     source.consume(&Token::Slash)?;
 
-                    let next = self.parse_step(source)?.context(TrailingSlash)?;
+                    let next = self.parse_step(source)?.ok_or(Error::TrailingSlash)?;
                     steps.push(next);
                 }
 
@@ -499,7 +509,7 @@ impl Parser {
 
                     let expr = self
                         .parse_relative_location_path_raw(source, expr)?
-                        .context(TrailingSlash)?;
+                        .ok_or(Error::TrailingSlash)?;
                     Ok(Some(expr))
                 } else {
                     Ok(Some(expr))
@@ -536,7 +546,7 @@ impl Parser {
 
             let expression = self
                 .parse_unary_expression(source)?
-                .context(RightHandSideExpressionMissing)?;
+                .ok_or(Error::RightHandSideExpressionMissing)?;
             let expression: SubExpression = Box::new(expression::Negation { expression });
             Ok(Some(expression))
         } else {
@@ -675,17 +685,18 @@ impl Parser {
 
         let expr = self.parse_or_expression(&mut source)?;
 
-        ensure!(!source.has_more_tokens(), ExtraUnparsedTokens);
+        if source.has_more_tokens() {
+            Err(Error::ExtraUnparsedTokens)
+        } else {
+            let expr = expr.ok_or(Error::NoXPath)?;
 
-        let expr = expr.context(NoXPath)?;
-
-        Ok(expr)
+            Ok(expr)
+        }
     }
 }
 
 #[cfg(test)]
 mod test {
-    use snafu::ResultExt;
     use std::borrow::ToOwned;
     use sxd_document::dom::{self, Document, Element, Root, Text};
     use sxd_document::Package;
@@ -1810,10 +1821,9 @@ mod test {
         let ex = Exercise::new(&doc);
         let res = ex.parse_raw(tokens);
         assert_eq!(
-            tokenizer::UnableToCreateToken
-                .fail::<()>()
-                .context(Tokenizer)
-                .err(),
+            Some(Error::Tokenizer {
+                source: tokenizer::Error::UnableToCreateToken
+            }),
             res.err()
         );
     }
